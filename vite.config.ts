@@ -7,4 +7,7 @@ export default defineConfig({
   server: {
     port: 8888
   },
+  resolve: {
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
+  },
 })

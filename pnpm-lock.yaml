@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@vitejs/plugin-vue': ^3.1.0
   monaco-editor: ^0.34.1
+  monaco-themes: ^0.4.2
   typescript: ^4.6.4
   vite: ^3.1.0
   vue: ^3.2.37
@@ -10,6 +11,7 @@ specifiers:
 
 dependencies:
   monaco-editor: 0.34.1
+  monaco-themes: 0.4.2
   vue: 3.2.41
 
 devDependencies:
@@ -421,6 +423,12 @@ packages:
     resolution: {integrity: sha512-FKc80TyiMaruhJKKPz5SpJPIjL+dflGvz4CpuThaPMc94AyN7SeC9HQ8hrvaxX7EyHdJcUY5i4D0gNyJj1vSZQ==}
     dev: false
 
+  /monaco-themes/0.4.2:
+    resolution: {integrity: sha512-T3kp6SC5MPJvwYGXZENCd0UOIKVgUVV5SjsiXLBhgEZBnScY+6gEbwNRK1oYmfwbf+dGVqF1bSLN5YcrFu3HmA==}
+    dependencies:
+      fast-plist: r2.cnpmjs.org/fast-plist/0.1.2
+    dev: false
+
   /nanoid/3.3.4:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -525,6 +533,12 @@ packages:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==, registry: https://r.cnpmjs.org/, tarball: https://r2.cnpmjs.org/estree-walker/-/estree-walker-2.0.2.tgz}
     name: estree-walker
     version: 2.0.2
+
+  r2.cnpmjs.org/fast-plist/0.1.2:
+    resolution: {integrity: sha512-2HxzrqJhmMoxVzARjYFvkzkL2dCBB8sogU5sD8gqcZWv5UCivK9/cXM9KIPDRwU+eD3mbRDN/GhW8bO/4dtMfg==, registry: https://r.cnpmjs.org/, tarball: https://r2.cnpmjs.org/fast-plist/-/fast-plist-0.1.2.tgz}
+    name: fast-plist
+    version: 0.1.2
+    dev: false
 
   r2.cnpmjs.org/fsevents/2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==, registry: https://r.cnpmjs.org/, tarball: https://r2.cnpmjs.org/fsevents/-/fsevents-2.3.2.tgz}
