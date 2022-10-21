@@ -23,35 +23,43 @@
       return new editorWorker()
     }
   }
-  const editor = ref<monaco.editor.IStandaloneCodeEditor>()
+  let editor : monaco.editor.IStandaloneCodeEditor
   const editorLanguage = ref<string>()
+  // let editorLanguage
   onMounted(()=>{
-    editor.value = monaco.editor.create(document.getElementById('editor')!, {
+    editor = monaco.editor.create(document.getElementById('editor')!, {
       value: [
         'function x() {',
         '\tconsole.log("Hello world!");',
         '}'
       ].join('\n'),
       theme: 'vs-dark',
-      language: 'css'
+      language: 'javascript'
     })
     // 获取编辑器的语言
-    editorLanguage.value = editor.value.getModel()?.getLanguageId()
+    editorLanguage.value = editor.getModel()?.getLanguageId()
   })
-  watch(editorLanguage, (newVal)=>{
-    if(editor.value){
-      console.log("editorLanguage",newVal)
-      // 设置编辑器的语言
-      const model  = editor.value.getModel() as monaco.editor.ITextModel
-      monaco.editor.setModelLanguage(model, newVal as string)
-      console.log(editor.value)
-    }
-  })
+  // watch(editorLanguage, (newVal)=>{
+  //   if(editor){
+  //     console.log("editorLanguage",newVal)
+  //     // 设置编辑器的语言
+  //     const model  = editor.getModel() as monaco.editor.ITextModel
+  //     monaco.editor.setModelLanguage(model, newVal as string)
+  //     console.log(editor.getValue())
+  //   }
+  // })
+  const handleLanguageChange = (e) => {
+    // 设置编辑器的语言
+    console.log(e.target.value)
+    const model  = editor.getModel() as monaco.editor.ITextModel
+    monaco.editor.setModelLanguage(model, e.target.value)
+    console.log(editor.getValue())
+  }
 </script>
 
 <template>
   <div class="editor-container">
-    <select v-model="editorLanguage">
+    <select v-model="editorLanguage" @change="handleLanguageChange">
       <option value="css">css</option>
       <option value="html">html</option>
       <option value="javascript">javascript</option>
