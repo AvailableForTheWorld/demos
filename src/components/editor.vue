@@ -48,12 +48,39 @@
   //     console.log(editor.getValue())
   //   }
   // })
-  const handleLanguageChange = (e) => {
+  
+  interface IdefaultValueMappings{
+    [key: string]: string
+  }
+
+  const handleLanguageChange = (e:Event) => {
     // 设置编辑器的语言
-    console.log(e.target.value)
+    const target = e.target as HTMLInputElement
     const model  = editor.getModel() as monaco.editor.ITextModel
-    monaco.editor.setModelLanguage(model, e.target.value)
+    monaco.editor.setModelLanguage(model, target.value)
     console.log(editor.getValue())
+    editor.setValue(defaultValueMappings[target.value])
+  }
+  const defaultValueMappings : IdefaultValueMappings= {
+    css: `.editor-container{
+      width: 100%;
+      height: 100%;
+    }`,
+    html: `<div>hello html</div>`,
+    javascript: `function printHelloWorld(){
+      console.log("hello world")
+    }`,
+    json: `{
+      hello: 'world'
+    }`,
+    cpp: `#include<iostream>
+      using namespace std;
+      int main(){
+        cout<<"hello world"<<endl;
+      }`,
+    scss: `$highlight: #ff9900`,
+    typescript: `const hello : string = 'world'`,
+    xml: `<hello>world</hello>`
   }
 </script>
 
@@ -64,18 +91,13 @@
       <option value="html">html</option>
       <option value="javascript">javascript</option>
       <option value="json">json</option>
-      <option value="less">less</option>
-      <option value="markdown">markdown</option>
-      <option value="php">php</option>
-      <option value="python">python</option>
+      <option value="cpp">c++</option>
       <option value="scss">scss</option>
-      <option value="sql">sql</option>
       <option value="typescript">typescript</option>
       <option value="xml">xml</option>
     </select>
     <div id="editor">
     </div>
-    editor
   </div>
 </template>
 
