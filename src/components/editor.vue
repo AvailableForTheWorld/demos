@@ -32,6 +32,8 @@ let originalModel : monaco.editor.ITextModel;
 let modifiedModel : monaco.editor.ITextModel;
 const editorLanguage = ref<string>();
 const currentTheme = ref("Dracula");
+
+const posValue = ref('0:0');
 // let editorLanguage
 onMounted(async () => {
   editor = monaco.editor.create(document.getElementById("editor")!, {
@@ -129,6 +131,21 @@ const setModifiedValue = () => {
   modifiedModel.setValue(editor.getValue())
 }
 
+const getCursorPosition = ()=> {
+	let line = editor.getPosition()?.lineNumber;
+	let column = editor.getPosition()?.column;
+	return { ln: line, col: column };
+}
+
+const setCursorPosition = (x:number,y:number) => {
+	let pos = { lineNumber: x, column: y };
+	editor.setPosition(pos);
+  editor.focus()
+}
+const setCursor = () => {
+  const [x,y] = posValue.value.split(':')
+  setCursorPosition(Number(x),Number(y))
+}
 const defaultValueMappings: IdefaultValueMappings = {
   css: `.editor-container{
   width: 100%;
@@ -195,9 +212,12 @@ int main(){
       </select>
       <button @click="setOriginValue">Original</button>
       <button @click="setModifiedValue">Modified</button>
+      <button @click="setCursor">SetPosition</button>
+      <input v-model="posValue">
     </div>
     <div id="editor"></div>
     <div id="diff"></div>
+    
   </div>
 </template>
 
