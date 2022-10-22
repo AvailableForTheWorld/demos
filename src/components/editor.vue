@@ -59,6 +59,8 @@ onMounted(async () => {
     original: originalModel,
     modified: modifiedModel,
   });
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit1 , setOriginValue);
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit2, setModifiedValue);
   setTheme(currentTheme.value)
   // 获取编辑器的语言
   editorLanguage.value = editor.getModel()?.getLanguageId();
