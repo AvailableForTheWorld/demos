@@ -28,6 +28,7 @@ self.MonacoEnvironment = {
 };
 let editor: monaco.editor.IStandaloneCodeEditor;
 const editorLanguage = ref<string>();
+const currentTheme = ref("Dracula");
 // let editorLanguage
 onMounted(async () => {
   editor = monaco.editor.create(document.getElementById("editor")!, {
@@ -35,14 +36,7 @@ onMounted(async () => {
     theme: "vs-dark",
     language: "javascript",
   });
-  const amy = 'Amy.json'
-  const themeName = amy.split('.')[0]
-  getAssetsFile(amy).then((res)=>{
-    res().then((data)=>{
-      monaco.editor.defineTheme(themeName, data);
-      monaco.editor.setTheme(themeName);
-    })
-  })
+  setTheme(currentTheme.value)
     // .then((data) => {
     //   themeData = data;
     //   monaco.editor.defineTheme("Amy", themeData);
@@ -67,7 +61,16 @@ onMounted(async () => {
 //   }
 // })
 
-
+const setTheme = (theme: string) => {
+  getAssetsFile(theme).then((res)=>{
+    res().then((data)=>{
+      const themeName = theme.split(' ').join('')
+      monaco.editor.defineTheme(themeName, data);
+      console.log("data",data)
+      monaco.editor.setTheme(themeName);
+    })
+  })
+};
 
 interface IdefaultValueMappings {
   [key: string]: string;
@@ -81,6 +84,10 @@ const handleLanguageChange = (e: Event) => {
   console.log(editor.getValue());
   editor.setValue(defaultValueMappings[target.value]);
 };
+const handleThemeChange = (e:Event) => {
+  const target = e.target as HTMLInputElement;
+  setTheme(target.value)
+}
 const defaultValueMappings: IdefaultValueMappings = {
   css: `.editor-container{
   width: 100%;
@@ -115,6 +122,38 @@ int main(){
       <option value="scss">scss</option>
       <option value="typescript">typescript</option>
       <option value="xml">xml</option>
+    </select>
+    <select v-model="currentTheme" @change="handleThemeChange">
+      <option value="Active4D">Active4D</option>
+      <option value="Amy">Amy</option>
+      <option value="Blackboard">Blackboard</option>
+      <option value="Cobalt">Cobalt</option>
+      <option value="Dawn">Dawn</option>
+      <option value="Dracula">Dracula</option>
+      <option value="Dreamweaver">Dreamweaver</option>
+      <option value="Eiffel">Eiffel</option>
+      <option value="Espresso Libre">Espresso Libre</option>
+      <option value="GitHub">GitHub</option>
+      <option value="idleFingers">Idle Fingers</option>
+      <option value="Katzenmilch">Katzenmilch</option>
+      <option value="Kuroir Theme">Kuroir</option>
+      <option value="Merbivore">Merbivore</option>
+      <option value="Merbivore Soft">Merbivore Soft</option>
+      <option value="Mono Industrial">Mono Industrial</option>
+      <option value="Monokai">Monokai</option>
+      <option value="Pastels on Dark">Pastel on Dark</option>
+      <option value="Solarized Dark">Solarized Dark</option>
+      <option value="Solarized Light">Solarized Light</option>
+      <option value="SQL Server">SQL Server</option>
+      <option value="Terminal">Terminal</option>
+      <option value="TextMate">TextMate</option>
+      <option value="Tomorrow">Tomorrow</option>
+      <option value="Tomorrow-Night">Tomorrow Night</option>
+      <option value="Tomorrow-Night-Blue">Tomorrow Night Blue</option>
+      <option value="Tomorrow-Night-Bright">Tomorrow Night Bright</option>
+      <option value="Tomorrow-Night-Eighties">Tomorrow Night Eighties</option>
+      <option value="Twilight">Twilight</option>
+      <option value="Vibrant Ink">Vibrant Ink</option>
     </select>
     <div id="editor"></div>
   </div>
