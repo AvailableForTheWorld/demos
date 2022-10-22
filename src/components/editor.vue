@@ -61,6 +61,24 @@ onMounted(async () => {
   });
   editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit1 , setOriginValue);
   editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit2, setModifiedValue);
+  const actionDesc = {
+    id: 'setOriginValue',
+    label: 'setOriginValue',
+    keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.Digit1],
+    contextMenuGroupId: 'setOriginValue',
+    contextMenuOrder: 1.5,
+    run: setOriginValue
+  } as monaco.editor.IActionDescriptor;
+  editor.addAction(actionDesc);
+  const actionDesc2 = {
+    id: 'setModifiedValue',
+    label: 'setModifiedValue',
+    keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.Digit2],
+    contextMenuGroupId: 'setModifiedValue',
+    contextMenuOrder: 1.5,
+    run: setModifiedValue
+  } as monaco.editor.IActionDescriptor;
+  editor.addAction(actionDesc2);
   setTheme(currentTheme.value)
   // 获取编辑器的语言
   editorLanguage.value = editor.getModel()?.getLanguageId();
