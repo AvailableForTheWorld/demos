@@ -28,6 +28,8 @@ self.MonacoEnvironment = {
 };
 let editor: monaco.editor.IStandaloneCodeEditor;
 let diff : monaco.editor.IStandaloneDiffEditor;
+let originalModel : monaco.editor.ITextModel;
+let modifiedModel : monaco.editor.ITextModel;
 const editorLanguage = ref<string>();
 const currentTheme = ref("Dracula");
 // let editorLanguage
@@ -37,15 +39,15 @@ onMounted(async () => {
     theme: "vs-dark",
     language: "javascript",
   });
-  const originalModel = monaco.editor.createModel(
+  originalModel = monaco.editor.createModel(
     "This line is removed on the right.\njust some text\nabcd\nefgh\nSome more text",
     "text/plain"
   );
-  const modifiedModel = monaco.editor.createModel(
+  modifiedModel = monaco.editor.createModel(
     "just some text\nabcz\nzzzzefgh\nSome more text.\nThis line is removed on the left.",
     "text/plain"
   );
-  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!);
+  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!,{readOnly:false,domReadOnly:false});
   const navi = monaco.editor.createDiffNavigator(diff, {
     followsCaret: true, // resets the navigator state when the user selects something in the editor
     ignoreCharChanges: true // jump from line to line
@@ -99,6 +101,14 @@ const handleThemeChange = (e:Event) => {
   const target = e.target as HTMLInputElement;
   setTheme(target.value)
 }
+
+const setOriginValue = () => {
+  originalModel.setValue(editor.getValue())
+}
+const setModifiedValue = () => {
+  modifiedModel.setValue(editor.getValue())
+}
+
 const defaultValueMappings: IdefaultValueMappings = {
   css: `.editor-container{
   width: 100%;
@@ -163,6 +173,8 @@ int main(){
         <option value="Twilight">Twilight</option>
         <option value="Vibrant Ink">Vibrant Ink</option>
       </select>
+      <button @click="setOriginValue">Original</button>
+      <button @click="setModifiedValue">Modified</button>
     </div>
     <div id="editor"></div>
     <div id="diff"></div>
