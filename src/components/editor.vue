@@ -45,7 +45,14 @@ onMounted(async () => {
     "just some text\nabcz\nzzzzefgh\nSome more text.\nThis line is removed on the left.",
     "text/plain"
   );
-  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!,{renderSideBySide: false});
+  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!);
+  const navi = monaco.editor.createDiffNavigator(diff, {
+    followsCaret: true, // resets the navigator state when the user selects something in the editor
+    ignoreCharChanges: true // jump from line to line
+  });
+  window.setInterval(function () {
+    navi.next();
+  }, 2000);
   diff.setModel({
     original: originalModel,
     modified: modifiedModel,
