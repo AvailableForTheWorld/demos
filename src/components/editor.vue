@@ -45,7 +45,7 @@ onMounted(async () => {
     "just some text\nabcz\nzzzzefgh\nSome more text.\nThis line is removed on the left.",
     "text/plain"
   );
-  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!);
+  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!,{renderSideBySide: false});
   diff.setModel({
     original: originalModel,
     modified: modifiedModel,
