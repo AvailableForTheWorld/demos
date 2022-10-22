@@ -113,61 +113,70 @@ int main(){
 
 <template>
   <div class="editor-container">
-    <select v-model="editorLanguage" @change="handleLanguageChange">
-      <option value="css">css</option>
-      <option value="html">html</option>
-      <option value="javascript">javascript</option>
-      <option value="json">json</option>
-      <option value="cpp">c++</option>
-      <option value="scss">scss</option>
-      <option value="typescript">typescript</option>
-      <option value="xml">xml</option>
-    </select>
-    <select v-model="currentTheme" @change="handleThemeChange">
-      <option value="Active4D">Active4D</option>
-      <option value="Amy">Amy</option>
-      <option value="Blackboard">Blackboard</option>
-      <option value="Cobalt">Cobalt</option>
-      <option value="Dawn">Dawn</option>
-      <option value="Dracula">Dracula</option>
-      <option value="Dreamweaver">Dreamweaver</option>
-      <option value="Eiffel">Eiffel</option>
-      <option value="Espresso Libre">Espresso Libre</option>
-      <option value="GitHub">GitHub</option>
-      <option value="idleFingers">Idle Fingers</option>
-      <option value="Katzenmilch">Katzenmilch</option>
-      <option value="Kuroir Theme">Kuroir</option>
-      <option value="Merbivore">Merbivore</option>
-      <option value="Merbivore Soft">Merbivore Soft</option>
-      <option value="Mono Industrial">Mono Industrial</option>
-      <option value="Monokai">Monokai</option>
-      <option value="Pastels on Dark">Pastel on Dark</option>
-      <option value="Solarized Dark">Solarized Dark</option>
-      <option value="Solarized Light">Solarized Light</option>
-      <option value="SQL Server">SQL Server</option>
-      <option value="Terminal">Terminal</option>
-      <option value="TextMate">TextMate</option>
-      <option value="Tomorrow">Tomorrow</option>
-      <option value="Tomorrow-Night">Tomorrow Night</option>
-      <option value="Tomorrow-Night-Blue">Tomorrow Night Blue</option>
-      <option value="Tomorrow-Night-Bright">Tomorrow Night Bright</option>
-      <option value="Tomorrow-Night-Eighties">Tomorrow Night Eighties</option>
-      <option value="Twilight">Twilight</option>
-      <option value="Vibrant Ink">Vibrant Ink</option>
-    </select>
+    <div class="select">
+      <select class="select-languages" v-model="editorLanguage" @change="handleLanguageChange">
+        <option value="css">css</option>
+        <option value="html">html</option>
+        <option value="javascript">javascript</option>
+        <option value="json">json</option>
+        <option value="cpp">c++</option>
+        <option value="scss">scss</option>
+        <option value="typescript">typescript</option>
+        <option value="xml">xml</option>
+      </select>
+      <select class="select-theme" v-model="currentTheme" @change="handleThemeChange">
+        <option value="Active4D">Active4D</option>
+        <option value="Amy">Amy</option>
+        <option value="Blackboard">Blackboard</option>
+        <option value="Cobalt">Cobalt</option>
+        <option value="Dawn">Dawn</option>
+        <option value="Dracula">Dracula</option>
+        <option value="Dreamweaver">Dreamweaver</option>
+        <option value="Eiffel">Eiffel</option>
+        <option value="Espresso Libre">Espresso Libre</option>
+        <option value="GitHub">GitHub</option>
+        <option value="idleFingers">Idle Fingers</option>
+        <option value="Katzenmilch">Katzenmilch</option>
+        <option value="Kuroir Theme">Kuroir</option>
+        <option value="Merbivore">Merbivore</option>
+        <option value="Merbivore Soft">Merbivore Soft</option>
+        <option value="Monokai">Monokai</option>
+        <option value="Pastels on Dark">Pastel on Dark</option>
+        <option value="Solarized-dark">Solarized Dark</option>
+        <option value="Solarized-light">Solarized Light</option>
+        <option value="Tomorrow">Tomorrow</option>
+        <option value="Tomorrow-Night">Tomorrow Night</option>
+        <option value="Tomorrow-Night-Blue">Tomorrow Night Blue</option>
+        <option value="Tomorrow-Night-Bright">Tomorrow Night Bright</option>
+        <option value="Tomorrow-Night-Eighties">Tomorrow Night Eighties</option>
+        <option value="Twilight">Twilight</option>
+        <option value="Vibrant Ink">Vibrant Ink</option>
+      </select>
+    </div>
     <div id="editor"></div>
   </div>
 </template>
 
 <style scoped>
+body {
+  margin: 0;
+  padding: 0;
+}
 .editor-container {
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
 }
+.select {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  margin: 10px 0;
+}
 #editor {
   width: 100%;
-  height: 100%;
+  height: 90%;
+  flex: 1;
 }
 </style>
