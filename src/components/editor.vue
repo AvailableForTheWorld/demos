@@ -27,6 +27,7 @@ self.MonacoEnvironment = {
   },
 };
 let editor: monaco.editor.IStandaloneCodeEditor;
+let diff : monaco.editor.IStandaloneDiffEditor;
 const editorLanguage = ref<string>();
 const currentTheme = ref("Dracula");
 // let editorLanguage
@@ -36,18 +37,20 @@ onMounted(async () => {
     theme: "vs-dark",
     language: "javascript",
   });
+  const originalModel = monaco.editor.createModel(
+    "This line is removed on the right.\njust some text\nabcd\nefgh\nSome more text",
+    "text/plain"
+  );
+  const modifiedModel = monaco.editor.createModel(
+    "just some text\nabcz\nzzzzefgh\nSome more text.\nThis line is removed on the left.",
+    "text/plain"
+  );
+  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!);
+  diff.setModel({
+    original: originalModel,
+    modified: modifiedModel,
+  });
   setTheme(currentTheme.value)
-    // .then((data) => {
-    //   themeData = data;
-    //   monaco.editor.defineTheme("Amy", themeData);
-    //   editor.updateOptions({ theme: "Amy" });
-    // });
-  // import(getPath()).then((theme) => {
-  //   monaco.editor.defineTheme(amy, theme);
-  // }).then(() => {
-  //   editor.updateOptions({ theme: amy });
-  // });
-  
   // 获取编辑器的语言
   editorLanguage.value = editor.getModel()?.getLanguageId();
 });
@@ -61,6 +64,7 @@ onMounted(async () => {
 //   }
 // })
 
+// 设置主题
 const setTheme = (theme: string) => {
   getAssetsFile(theme).then((res)=>{
     res().then((data)=>{
@@ -154,6 +158,7 @@ int main(){
       </select>
     </div>
     <div id="editor"></div>
+    <div id="diff"></div>
   </div>
 </template>
 
@@ -176,7 +181,10 @@ body {
 }
 #editor {
   width: 100%;
-  height: 90%;
-  flex: 1;
+  height: 50%;
+}
+#diff {
+  width: 100%;
+  height: 50%;
 }
 </style>
