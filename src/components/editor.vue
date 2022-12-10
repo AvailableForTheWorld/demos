@@ -95,7 +95,7 @@ const setTheme = (theme: string) => {
   getAssetsFile(theme).then((res) => {
     res().then((data) => {
       const themeName = theme.split(' ').join('')
-      monaco.editor.defineTheme(themeName, data)
+      monaco.editor.defineTheme(themeName, data as monaco.editor.IStandaloneThemeData)
       console.log('data', data)
       monaco.editor.setTheme(themeName)
     })
