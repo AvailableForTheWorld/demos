@@ -1,90 +1,85 @@
 <script setup lang="ts">
-import * as monaco from "monaco-editor";
-import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
-import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
-import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
-import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
-import { nextTick, onMounted, ref, watch } from "vue";
-import {getAssetsFile} from "../utils/file";
+import * as monaco from 'monaco-editor'
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution'
+import { nextTick, onMounted, ref, watch } from 'vue'
+import { getAssetsFile } from '../utils/file'
 
-let themeData : monaco.editor.IStandaloneThemeData;
+let themeData: monaco.editor.IStandaloneThemeData
 self.MonacoEnvironment = {
   getWorker(_, label) {
-    if (label === "json") {
-      return new jsonWorker();
+    if (label === 'json') {
+      return new jsonWorker()
     }
-    if (label === "css" || label === "scss" || label === "less") {
-      return new cssWorker();
+    if (label === 'css' || label === 'scss' || label === 'less') {
+      return new cssWorker()
     }
-    if (label === "html" || label === "handlebars" || label === "razor") {
-      return new htmlWorker();
+    if (label === 'html' || label === 'handlebars' || label === 'razor') {
+      return new htmlWorker()
     }
-    if (label === "typescript" || label === "javascript") {
-      return new tsWorker();
+    if (label === 'typescript' || label === 'javascript') {
+      return new tsWorker()
     }
-    return new editorWorker();
+    return new editorWorker()
   },
-};
-let editor: monaco.editor.IStandaloneCodeEditor;
-let diff : monaco.editor.IStandaloneDiffEditor;
-let originalModel : monaco.editor.ITextModel;
-let modifiedModel : monaco.editor.ITextModel;
-const editorLanguage = ref<string>();
-const currentTheme = ref("Dracula");
+}
+let editor: monaco.editor.IStandaloneCodeEditor
+let diff: monaco.editor.IStandaloneDiffEditor
+let originalModel: monaco.editor.ITextModel
+let modifiedModel: monaco.editor.ITextModel
+const editorLanguage = ref<string>()
+const currentTheme = ref('Dracula')
 
-const posValue = ref('0:0');
+const posValue = ref('0:0')
 // let editorLanguage
 onMounted(async () => {
-  editor = monaco.editor.create(document.getElementById("editor")!, {
-    value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join("\n"),
-    theme: "vs-dark",
-    language: "javascript",
-  });
-  originalModel = monaco.editor.createModel(
-    "This line is removed on the right.\njust some text\nabcd\nefgh\nSome more text",
-    "text/plain"
-  );
-  modifiedModel = monaco.editor.createModel(
-    "just some text\nabcz\nzzzzefgh\nSome more text.\nThis line is removed on the left.",
-    "text/plain"
-  );
-  diff = monaco.editor.createDiffEditor(document.getElementById("diff")!,{readOnly:false,domReadOnly:false});
+  editor = monaco.editor.create(document.getElementById('editor')!, {
+    value: defaultValueMappings['typescript'],
+    theme: 'vs-dark',
+    language: 'typescript',
+  })
+  originalModel = monaco.editor.createModel('', 'text/plain')
+  modifiedModel = monaco.editor.createModel('', 'text/plain')
+  diff = monaco.editor.createDiffEditor(document.getElementById('diff')!, { readOnly: false, domReadOnly: false })
   const navi = monaco.editor.createDiffNavigator(diff, {
     followsCaret: true, // resets the navigator state when the user selects something in the editor
-    ignoreCharChanges: true // jump from line to line
-  });
-  window.setInterval(function () {
-    navi.next();
-  }, 2000);
+    ignoreCharChanges: true, // jump from line to line
+  })
+  // window.setInterval(function () {
+  //   navi.next()
+  // }, 2000)
   diff.setModel({
     original: originalModel,
     modified: modifiedModel,
-  });
-  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit1 , setOriginValue);
-  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit2, setModifiedValue);
+  })
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit1, setOriginValue)
+  editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.Digit2, setModifiedValue)
   const actionDesc = {
     id: 'setOriginValue',
     label: 'setOriginValue',
     keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.Digit1],
     contextMenuGroupId: 'setOriginValue',
     contextMenuOrder: 1.5,
-    run: setOriginValue
-  } as monaco.editor.IActionDescriptor;
-  editor.addAction(actionDesc);
+    run: setOriginValue,
+  } as monaco.editor.IActionDescriptor
+  editor.addAction(actionDesc)
   const actionDesc2 = {
     id: 'setModifiedValue',
     label: 'setModifiedValue',
     keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.Digit2],
     contextMenuGroupId: 'setModifiedValue',
     contextMenuOrder: 1.5,
-    run: setModifiedValue
-  } as monaco.editor.IActionDescriptor;
-  editor.addAction(actionDesc2);
+    run: setModifiedValue,
+  } as monaco.editor.IActionDescriptor
+  editor.addAction(actionDesc2)
   setTheme(currentTheme.value)
   // 获取编辑器的语言
-  editorLanguage.value = editor.getModel()?.getLanguageId();
-});
+  editorLanguage.value = editor.getModel()?.getLanguageId()
+})
 // watch(editorLanguage, (newVal)=>{
 //   if(editor){
 //     console.log("editorLanguage",newVal)
@@ -97,30 +92,30 @@ onMounted(async () => {
 
 // 设置主题
 const setTheme = (theme: string) => {
-  getAssetsFile(theme).then((res)=>{
-    res().then((data)=>{
+  getAssetsFile(theme).then((res) => {
+    res().then((data) => {
       const themeName = theme.split(' ').join('')
-      monaco.editor.defineTheme(themeName, data);
-      console.log("data",data)
-      monaco.editor.setTheme(themeName);
+      monaco.editor.defineTheme(themeName, data)
+      console.log('data', data)
+      monaco.editor.setTheme(themeName)
     })
   })
-};
+}
 
 interface IdefaultValueMappings {
-  [key: string]: string;
+  [key: string]: string
 }
 
 const handleLanguageChange = (e: Event) => {
   // 设置编辑器的语言
-  const target = e.target as HTMLInputElement;
-  const model = editor.getModel() as monaco.editor.ITextModel;
-  monaco.editor.setModelLanguage(model, target.value);
-  console.log(editor.getValue());
-  editor.setValue(defaultValueMappings[target.value]);
-};
-const handleThemeChange = (e:Event) => {
-  const target = e.target as HTMLInputElement;
+  const target = e.target as HTMLInputElement
+  const model = editor.getModel() as monaco.editor.ITextModel
+  monaco.editor.setModelLanguage(model, target.value)
+  console.log(editor.getValue())
+  editor.setValue(defaultValueMappings[target.value])
+}
+const handleThemeChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
   setTheme(target.value)
 }
 
@@ -131,20 +126,20 @@ const setModifiedValue = () => {
   modifiedModel.setValue(editor.getValue())
 }
 
-const getCursorPosition = ()=> {
-	let line = editor.getPosition()?.lineNumber;
-	let column = editor.getPosition()?.column;
-	return { ln: line, col: column };
+const getCursorPosition = () => {
+  let line = editor.getPosition()?.lineNumber
+  let column = editor.getPosition()?.column
+  return { ln: line, col: column }
 }
 
-const setCursorPosition = (x:number,y:number) => {
-	let pos = { lineNumber: x, column: y };
-	editor.setPosition(pos);
+const setCursorPosition = (x: number, y: number) => {
+  let pos = { lineNumber: x, column: y }
+  editor.setPosition(pos)
   editor.focus()
 }
 const setCursor = () => {
-  const [x,y] = posValue.value.split(':')
-  setCursorPosition(Number(x),Number(y))
+  const [x, y] = posValue.value.split(':')
+  setCursorPosition(Number(x), Number(y))
 }
 const defaultValueMappings: IdefaultValueMappings = {
   css: `.editor-container{
@@ -164,9 +159,24 @@ int main(){
   cout<<"hello world"<<endl;
 }`,
   scss: `$highlight: #ff9900`,
-  typescript: `const hello : string = 'world'`,
+  typescript: `const helloWorldString : string = 'world'\nconsole.log(helloWorldString)`,
   xml: `<hello>world</hello>`,
-};
+}
+
+const handleRun = () => {
+  compileCode()
+}
+async function compileCode() {
+  const worker = await monaco.languages.typescript.getTypeScriptWorker()
+  const model = editor.getModel()
+
+  const workerFn = await worker(model.uri)
+  const output = await workerFn.getEmitOutput(model.uri.toString())
+  if (output.outputFiles[0]) {
+    const code = output.outputFiles[0].text
+    eval(code)
+  }
+}
 </script>
 
 <template>
@@ -213,11 +223,11 @@ int main(){
       <button @click="setOriginValue">Original</button>
       <button @click="setModifiedValue">Modified</button>
       <button @click="setCursor">SetPosition</button>
-      <input v-model="posValue">
+      <button @click="handleRun">Run</button>
+      <input v-model="posValue" />
     </div>
     <div id="editor"></div>
     <div id="diff"></div>
-    
   </div>
 </template>
 
