@@ -174,13 +174,15 @@ const funcJS = (codeStr: string) => {
 
 async function compileCode() {
   const worker = await monaco.languages.typescript.getTypeScriptWorker()
-  const model = editor.getModel()
+  const model = editor.getModel() as monaco.editor.ITextModel
 
   const workerFn = await worker(model.uri)
   const output = await workerFn.getEmitOutput(model.uri.toString())
   if (output.outputFiles[0]) {
     const code = output.outputFiles[0].text
-    funcJS(code)
+    // 使用funcJS函数执行代码，但是这种方式无法获取到外部环境中的变量， 但使用eval可以获取到外部环境中的变量,虽然eval也有安全隐患，但是这里只是用来执行代码，不会有安全问题
+    // funcJS(code)
+    eval(code)
   }
 }
 </script>
