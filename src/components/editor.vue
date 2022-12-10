@@ -166,6 +166,12 @@ int main(){
 const handleRun = () => {
   compileCode()
 }
+
+const funcJS = (codeStr: string) => {
+  const func = new Function(codeStr)
+  func()
+}
+
 async function compileCode() {
   const worker = await monaco.languages.typescript.getTypeScriptWorker()
   const model = editor.getModel()
@@ -174,7 +180,7 @@ async function compileCode() {
   const output = await workerFn.getEmitOutput(model.uri.toString())
   if (output.outputFiles[0]) {
     const code = output.outputFiles[0].text
-    eval(code)
+    funcJS(code)
   }
 }
 </script>
