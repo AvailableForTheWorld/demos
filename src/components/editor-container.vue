@@ -54,10 +54,10 @@ onMounted(async () => {
       domReadOnly: false,
     }
   )
-  const navi = monaco.editor.createDiffNavigator(diff, {
-    followsCaret: true, // resets the navigator state when the user selects something in the editor
-    ignoreCharChanges: true, // jump from line to line
-  })
+  // const navi = monaco.editor.createDiffNavigator(diff, {
+  //   followsCaret: true, // resets the navigator state when the user selects something in the editor
+  //   ignoreCharChanges: true, // jump from line to line
+  // })
   // window.setInterval(function () {
   //   navi.next()
   // }, 2000)
@@ -138,11 +138,11 @@ const setModifiedValue = () => {
   modifiedModel.setValue(editor.getValue())
 }
 
-const getCursorPosition = () => {
-  let line = editor.getPosition()?.lineNumber
-  let column = editor.getPosition()?.column
-  return { ln: line, col: column }
-}
+// const getCursorPosition = () => {
+//   let line = editor.getPosition()?.lineNumber
+//   let column = editor.getPosition()?.column
+//   return { ln: line, col: column }
+// }
 
 const setCursorPosition = (x: number, y: number) => {
   let pos = { lineNumber: x, column: y }
@@ -181,10 +181,10 @@ const handleRun = () => {
   compileCode()
 }
 
-const funcJS = (codeStr: string) => {
-  const func = new Function(codeStr)
-  func()
-}
+// const funcJS = (codeStr: string) => {
+//   const func = new Function(codeStr)
+//   func()
+// }
 
 async function compileCode() {
   const worker = await monaco.languages.typescript.getTypeScriptWorker()
