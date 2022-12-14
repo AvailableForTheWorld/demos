@@ -37,17 +37,23 @@ const currentTheme = ref('Dracula')
 const posValue = ref('0:0')
 // let editorLanguage
 onMounted(async () => {
-  editor = monaco.editor.create(document.getElementById('editor')!, {
-    value: defaultValueMappings['typescript'],
-    theme: 'vs-dark',
-    language: 'typescript',
-  })
+  editor = monaco.editor.create(
+    document.getElementById('editor') as HTMLElement,
+    {
+      value: defaultValueMappings['typescript'],
+      theme: 'vs-dark',
+      language: 'typescript',
+    }
+  )
   originalModel = monaco.editor.createModel('', 'text/plain')
   modifiedModel = monaco.editor.createModel('', 'text/plain')
-  diff = monaco.editor.createDiffEditor(document.getElementById('diff')!, {
-    readOnly: false,
-    domReadOnly: false,
-  })
+  diff = monaco.editor.createDiffEditor(
+    document.getElementById('diff') as HTMLElement,
+    {
+      readOnly: false,
+      domReadOnly: false,
+    }
+  )
   const navi = monaco.editor.createDiffNavigator(diff, {
     followsCaret: true, // resets the navigator state when the user selects something in the editor
     ignoreCharChanges: true, // jump from line to line
