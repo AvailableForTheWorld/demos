@@ -44,7 +44,10 @@ onMounted(async () => {
   })
   originalModel = monaco.editor.createModel('', 'text/plain')
   modifiedModel = monaco.editor.createModel('', 'text/plain')
-  diff = monaco.editor.createDiffEditor(document.getElementById('diff')!, { readOnly: false, domReadOnly: false })
+  diff = monaco.editor.createDiffEditor(document.getElementById('diff')!, {
+    readOnly: false,
+    domReadOnly: false,
+  })
   const navi = monaco.editor.createDiffNavigator(diff, {
     followsCaret: true, // resets the navigator state when the user selects something in the editor
     ignoreCharChanges: true, // jump from line to line
@@ -95,7 +98,10 @@ const setTheme = (theme: string) => {
   getAssetsFile(theme).then((res) => {
     res().then((data) => {
       const themeName = theme.split(' ').join('')
-      monaco.editor.defineTheme(themeName, data as monaco.editor.IStandaloneThemeData)
+      monaco.editor.defineTheme(
+        themeName,
+        data as monaco.editor.IStandaloneThemeData
+      )
       console.log('data', data)
       monaco.editor.setTheme(themeName)
     })
@@ -146,7 +152,7 @@ const defaultValueMappings: IdefaultValueMappings = {
   width: 100%;
   height: 100%;
 }`,
-  html: `<div>hello html</div>`,
+  html: '<div>hello html</div>',
   javascript: `function printHelloWorld(){
   console.log("hello world")
 }`,
@@ -158,9 +164,11 @@ using namespace std;
 int main(){
   cout<<"hello world"<<endl;
 }`,
-  scss: `$highlight: #ff9900`,
-  typescript: `const helloWorldString : string = 'world'\nconsole.log(helloWorldString)`,
-  xml: `<hello>world</hello>`,
+  scss: '$highlight: #ff9900',
+  typescript:
+    // eslint-disable-next-line quotes
+    "const helloWorldString : string = 'world'\nconsole.log(helloWorldString)",
+  xml: '<hello>world</hello>',
 }
 
 const handleRun = () => {
@@ -190,7 +198,11 @@ async function compileCode() {
 <template>
   <div class="editor-container">
     <div class="select">
-      <select class="select-languages" v-model="editorLanguage" @change="handleLanguageChange">
+      <select
+        class="select-languages"
+        v-model="editorLanguage"
+        @change="handleLanguageChange"
+      >
         <option value="css">css</option>
         <option value="html">html</option>
         <option value="javascript">javascript</option>
@@ -200,7 +212,11 @@ async function compileCode() {
         <option value="typescript">typescript</option>
         <option value="xml">xml</option>
       </select>
-      <select class="select-theme" v-model="currentTheme" @change="handleThemeChange">
+      <select
+        class="select-theme"
+        v-model="currentTheme"
+        @change="handleThemeChange"
+      >
         <option value="Active4D">Active4D</option>
         <option value="Amy">Amy</option>
         <option value="Blackboard">Blackboard</option>
