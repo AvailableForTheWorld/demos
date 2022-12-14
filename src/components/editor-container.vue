@@ -6,10 +6,10 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution'
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { getAssetsFile } from '../utils/file'
 
-let themeData: monaco.editor.IStandaloneThemeData
+// let themeData: monaco.editor.IStandaloneThemeData
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'json') {
