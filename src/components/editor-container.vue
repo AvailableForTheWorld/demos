@@ -158,23 +158,23 @@ const defaultValueMappings: IdefaultValueMappings = {
   width: 100%;
   height: 100%;
 }`,
-  html: '<div>hello html</div>',
+  html: '<div>hello hotfix</div>',
   javascript: `function printHelloWorld(){
-  console.log("hello world")
+  console.log("hello hotfix")
 }`,
   json: `{
-    "hello": "world"
+    "hello": "hotfix"
 }`,
   cpp: `#include<iostream>
 using namespace std;
 int main(){
-  cout<<"hello world"<<endl;
+  cout<<"hello hotfix"<<endl;
 }`,
   scss: '$highlight: #ff9900',
   typescript:
     // eslint-disable-next-line quotes
-    "const helloWorldString : string = 'world'\nconsole.log(helloWorldString)",
-  xml: '<hello>world</hello>',
+    "const helloWorldString : string = 'hotfix'\nconsole.log(helloWorldString)",
+  xml: '<hello>hotfix</hello>',
 }
 
 const handleRun = () => {
