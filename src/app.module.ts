@@ -3,12 +3,11 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { CatsController } from './cats/cats.controller'
 import { ResModule } from './res/res.module'
-import { CoffeesController } from './coffees/coffees.controller'
-import { CoffeesService } from './coffees/coffees.service'
+import { CoffeesModule } from './coffees/coffees.module'
 
 @Module({
-  imports: [ResModule],
-  controllers: [AppController, CatsController, CoffeesController],
+  imports: [ResModule, CoffeesModule],
+  controllers: [AppController],
   providers: [
     AppService,
     {
@@ -18,7 +17,6 @@ import { CoffeesService } from './coffees/coffees.service'
         age: 4000000000,
       },
     },
-    CoffeesService,
   ],
 })
 export class AppModule {}
