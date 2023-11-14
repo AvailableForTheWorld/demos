@@ -23,7 +23,6 @@ export class CatsController {
 
   @Get(':id')
   getCats(@Param() params, @Query('ver') ver: number): string {
-    debugger
     if (ver < 3)
       return `This action returns no more than three cats ${params.id}`
     return `This action returns all cats ${params.id}`
