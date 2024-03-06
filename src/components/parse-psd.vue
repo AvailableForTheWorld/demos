@@ -22,12 +22,30 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 		compoundCtx.globalAlpha = layer.opacity || 1
 		compoundCtx.drawImage(layer.canvas, 0, 0)
 		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask)) {
-			// const offsetX = (layer.canvas.width - layer.mask.canvas.width) / 2
-			// const offsetY = (layer.canvas.height - layer.mask.canvas.height) / 2
+			// Prepare mask
+			const maskCanvas = document.createElement('canvas')
+			const maskCtx = maskCanvas.getContext('2d')
+			maskCanvas.width = layer.mask.right - layer.mask.left
+			maskCanvas.height = layer.mask.bottom - layer.mask.top
+
+			// Draw mask
+			maskCtx.drawImage(layer.mask.canvas, 0, 0)
+
+			// Convert grayscale to alpha
+			const maskImageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)
+			const data = maskImageData.data
+			for (let i = 0; i < data.length; i += 4) {
+				// Assuming the mask is grayscale, the R, G, and B values should be approximately equal.
+				// The alpha value of each pixel is set based on the average of the RGB values.
+				const avg = (data[i] + data[i + 1] + data[i + 2]) / 3
+				data[i + 3] = avg // Set alpha channel to the average of R, G, and B
+			}
+			maskCtx.putImageData(maskImageData, 0, 0)
+
+			// Apply mask
 			const maskX = layer.mask.left - layer.left
 			const maskY = layer.mask.top - layer.top
 			compoundCtx.globalCompositeOperation = 'destination-in'
-			const maskCanvas = layer.mask.canvas as HTMLCanvasElement
 			compoundCtx.drawImage(maskCanvas, maskX, maskY)
 		}
 		// compoundCtx.globalCompositeOperation = 'source-over'
