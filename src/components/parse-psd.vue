@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { readPsd, Layer } from '../utils'
-import PsdFile from '../assets/psd/视觉1.psd'
+import PsdFile from '../assets/psd/视觉1-copy.psd'
 
 const judgeIsPosTypeRight = (
 	layer: Layer,
@@ -23,7 +23,7 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 		compoundCtx.drawImage(layer.canvas, 0, 0)
 		if (layer.effects) {
 			// console.log('layer.effects: ', layer)
-			const { solidFill } = layer.effects
+			const { solidFill, gradientOverlay: originGradientOverlay } = layer.effects
 			if (solidFill && Array.isArray(solidFill)) {
 				const fill = solidFill[0] as { enabled: boolean; color: { r: number; g: number; b: number; a?: number } }
 				if (fill.enabled) {
@@ -32,6 +32,33 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 					compoundCtx.fillRect(0, 0, compoundCanvas.width, compoundCanvas.height)
 					compoundCtx.globalCompositeOperation = 'source-over'
 				}
+			}
+			const gradientOverlay = originGradientOverlay.find((overlay) => overlay.enabled)
+			console.log('gradientOverlay: ', gradientOverlay)
+			if (gradientOverlay) {
+				// Create the gradient
+				let gradient
+				const angle = gradientOverlay.angle * (Math.PI / 180) // Convert degrees to radians
+				const x0 = compoundCanvas.width / 2 + Math.cos(angle + Math.PI) * compoundCanvas.width
+				const y0 = compoundCanvas.height / 2 + Math.sin(angle + Math.PI) * compoundCanvas.height
+				const x1 = compoundCanvas.width / 2 + Math.cos(angle) * compoundCanvas.width
+				const y1 = compoundCanvas.height / 2 + Math.sin(angle) * compoundCanvas.height
+
+				gradient = compoundCtx.createLinearGradient(x0, y0, x1, y1)
+
+				// Add color stops
+				gradientOverlay.gradient.colorStops.forEach((colorStop) => {
+					const color = colorStop.color
+					gradient.addColorStop(
+						colorStop.location,
+						`rgba(${color.r}, ${color.g}, ${color.b}, ${colorStop.opacity || 1})`,
+					)
+				})
+				compoundCtx.globalCompositeOperation = 'source-in'
+				// Apply the gradient
+				compoundCtx.fillStyle = gradient
+				compoundCtx.fillRect(0, 0, compoundCanvas.width, compoundCanvas.height)
+				compoundCtx.globalCompositeOperation = 'source-over'
 			}
 		}
 		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask) && layer.mask.canvas) {
