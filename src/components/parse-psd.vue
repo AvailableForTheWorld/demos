@@ -21,10 +21,23 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 		compoundCanvas.height = layer.bottom - layer.top
 		compoundCtx.globalAlpha = layer.opacity || 1
 		compoundCtx.drawImage(layer.canvas, 0, 0)
-		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask)) {
+		if (layer.effects) {
+			// console.log('layer.effects: ', layer)
+			const { solidFill } = layer.effects
+			if (solidFill && Array.isArray(solidFill)) {
+				const fill = solidFill[0] as { enabled: boolean; color: { r: number; g: number; b: number; a?: number } }
+				if (fill.enabled) {
+					compoundCtx.fillStyle = `rgba(${fill.color.r}, ${fill.color.g}, ${fill.color.b}, ${fill.color.a || 1})`
+					compoundCtx.globalCompositeOperation = 'source-in'
+					compoundCtx.fillRect(0, 0, compoundCanvas.width, compoundCanvas.height)
+					compoundCtx.globalCompositeOperation = 'source-over'
+				}
+			}
+		}
+		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask) && layer.mask.canvas) {
 			// Prepare mask
 			const maskCanvas = document.createElement('canvas')
-			const maskCtx = maskCanvas.getContext('2d')
+			const maskCtx = maskCanvas.getContext('2d') as CanvasRenderingContext2D
 			maskCanvas.width = layer.mask.right - layer.mask.left
 			maskCanvas.height = layer.mask.bottom - layer.mask.top
 
