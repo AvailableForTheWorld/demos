@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { readPsd, Layer, LayerEffectGradientOverlay, EffectSolidGradient, ColorStop, RGBA } from '../utils'
+import { readPsd, Layer, LayerEffectGradientOverlay, EffectSolidGradient, ColorStop, RGBA, RGB } from '../utils'
 import PsdFile from '../assets/psd/视觉1-copy.psd'
 
 const judgeIsPosTypeRight = (
@@ -16,9 +16,29 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 	}
 	const compoundCanvas = document.createElement('canvas')
 	const compoundCtx = compoundCanvas.getContext('2d') as CanvasRenderingContext2D
-	if (layer.canvas && !layer.hidden && judgeIsPosTypeRight(layer)) {
-		compoundCanvas.width = layer.right - layer.left
-		compoundCanvas.height = layer.bottom - layer.top
+	if (!judgeIsPosTypeRight(layer)) {
+		return
+	}
+	compoundCanvas.width = layer.right - layer.left
+	compoundCanvas.height = layer.bottom - layer.top
+	if (layer.text) {
+		console.log('layer: ', layer, layer.canvas.height)
+		const { style, text, transform } = layer.text
+		if (!style || !style.fontSize || !transform || !text) return
+		const fontHeight = style.fontSize * transform[0]
+		compoundCanvas.height = Math.max(fontHeight, compoundCanvas.height)
+		compoundCtx.font = fontHeight + 'px ' + style.font?.name
+		console.log('compoundCtx.font: ', compoundCtx.font)
+		const fillColor = style.fillColor as RGB
+		if (!fillColor) return
+		compoundCtx.fillStyle = `rgb(${fillColor.r},${fillColor.g},${fillColor.b})`
+		compoundCtx.textAlign = 'center'
+		compoundCtx.textBaseline = 'middle'
+		const x = compoundCanvas.width / 2 // X-coordinate for the text
+		const y = compoundCanvas.height / 2 // Y-coordinate for the text
+		compoundCtx.fillText(text, x, y)
+		context.drawImage(compoundCanvas, layer.left, layer.top)
+	} else if (layer.canvas && !layer.hidden) {
 		compoundCtx.globalAlpha = layer.opacity || 1
 		compoundCtx.drawImage(layer.canvas, 0, 0)
 		if (layer.effects) {
@@ -36,7 +56,6 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 			const gradientOverlay = originGradientOverlay?.find(
 				(overlay) => overlay.enabled,
 			) as LayerEffectGradientOverlay & { angle: number }
-			console.log('gradientOverlay: ', gradientOverlay)
 			if (gradientOverlay) {
 				// Create the gradient
 				let gradient: CanvasGradient
