@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { readPsd, Layer } from '../utils'
+import { readPsd, Layer, LayerEffectGradientOverlay, EffectSolidGradient, ColorStop, RGBA } from '../utils'
 import PsdFile from '../assets/psd/视觉1-copy.psd'
 
 const judgeIsPosTypeRight = (
@@ -33,12 +33,14 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 					compoundCtx.globalCompositeOperation = 'source-over'
 				}
 			}
-			const gradientOverlay = originGradientOverlay.find((overlay) => overlay.enabled)
+			const gradientOverlay = originGradientOverlay?.find(
+				(overlay) => overlay.enabled,
+			) as LayerEffectGradientOverlay & { angle: number }
 			console.log('gradientOverlay: ', gradientOverlay)
 			if (gradientOverlay) {
 				// Create the gradient
-				let gradient
-				const angle = gradientOverlay.angle * (Math.PI / 180) // Convert degrees to radians
+				let gradient: CanvasGradient
+				const angle = (gradientOverlay?.angle || 0) * (Math.PI / 180) // Convert degrees to radians
 				const x0 = compoundCanvas.width / 2 + Math.cos(angle + Math.PI) * compoundCanvas.width
 				const y0 = compoundCanvas.height / 2 + Math.sin(angle + Math.PI) * compoundCanvas.height
 				const x1 = compoundCanvas.width / 2 + Math.cos(angle) * compoundCanvas.width
@@ -46,13 +48,11 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 
 				gradient = compoundCtx.createLinearGradient(x0, y0, x1, y1)
 
+				const curGradient = gradientOverlay.gradient as EffectSolidGradient
 				// Add color stops
-				gradientOverlay.gradient.colorStops.forEach((colorStop) => {
-					const color = colorStop.color
-					gradient.addColorStop(
-						colorStop.location,
-						`rgba(${color.r}, ${color.g}, ${color.b}, ${colorStop.opacity || 1})`,
-					)
+				curGradient.colorStops.forEach((colorStop: ColorStop) => {
+					const color = colorStop.color as RGBA
+					gradient.addColorStop(colorStop.location, `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a || 1})`)
 				})
 				compoundCtx.globalCompositeOperation = 'source-in'
 				// Apply the gradient
