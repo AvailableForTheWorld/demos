@@ -22,13 +22,11 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 	compoundCanvas.width = layer.right - layer.left
 	compoundCanvas.height = layer.bottom - layer.top
 	if (layer.text) {
-		console.log('layer: ', layer, layer.canvas.height)
 		const { style, text, transform } = layer.text
 		if (!style || !style.fontSize || !transform || !text) return
 		const fontHeight = style.fontSize * transform[0]
 		compoundCanvas.height = Math.max(fontHeight, compoundCanvas.height)
 		compoundCtx.font = fontHeight + 'px ' + style.font?.name
-		console.log('compoundCtx.font: ', compoundCtx.font)
 		const fillColor = style.fillColor as RGB
 		if (!fillColor) return
 		compoundCtx.fillStyle = `rgb(${fillColor.r},${fillColor.g},${fillColor.b})`
@@ -38,11 +36,21 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 		const y = compoundCanvas.height / 2 // Y-coordinate for the text
 		compoundCtx.fillText(text, x, y)
 		context.drawImage(compoundCanvas, layer.left, layer.top)
-	} else if (layer.canvas && !layer.hidden) {
-		compoundCtx.globalAlpha = layer.opacity || 1
-		compoundCtx.drawImage(layer.canvas, 0, 0)
+	} else if ((layer.canvas || layer.imageData) && !layer.hidden) {
+		compoundCtx.globalAlpha = layer.opacity === undefined ? 1 : layer.opacity
+		if (layer.canvas) {
+			compoundCtx.drawImage(layer.canvas, 0, 0)
+		} else {
+			const data = layer.imageData.data
+			const opacity = compoundCtx.globalAlpha
+			if (opacity < 1) {
+				for (let i = 3; i < data.length; i += 4) {
+					data[i] = Math.round(data[i] * opacity)
+				}
+			}
+			compoundCtx.putImageData(layer.imageData as ImageData, 0, 0)
+		}
 		if (layer.effects) {
-			// console.log('layer.effects: ', layer)
 			const { solidFill, gradientOverlay: originGradientOverlay } = layer.effects
 			if (solidFill && Array.isArray(solidFill)) {
 				const fill = solidFill[0] as { enabled: boolean; color: { r: number; g: number; b: number; a?: number } }
@@ -80,7 +88,7 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 				compoundCtx.globalCompositeOperation = 'source-over'
 			}
 		}
-		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask) && layer.mask.canvas) {
+		if (layer.mask && !layer.hidden && judgeIsPosTypeRight(layer.mask) && (layer.mask.canvas || layer.mask.imageData)) {
 			// Prepare mask
 			const maskCanvas = document.createElement('canvas')
 			const maskCtx = maskCanvas.getContext('2d') as CanvasRenderingContext2D
@@ -88,7 +96,11 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 			maskCanvas.height = layer.mask.bottom - layer.mask.top
 
 			// Draw mask
-			maskCtx.drawImage(layer.mask.canvas, 0, 0)
+			if (layer.mask.canvas) {
+				maskCtx.drawImage(layer.mask.canvas, 0, 0)
+			} else {
+				maskCtx.putImageData(layer.mask.imageData as ImageData, 0, 0)
+			}
 
 			// Convert grayscale to alpha
 			const maskImageData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height)
@@ -108,7 +120,7 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 			compoundCtx.drawImage(maskCanvas, maskX, maskY)
 		}
 		// compoundCtx.globalCompositeOperation = 'source-over'
-		compoundCtx.globalAlpha = 1
+		// compoundCtx.globalAlpha = 1
 		context.drawImage(compoundCanvas, layer.left, layer.top)
 	}
 }
@@ -116,7 +128,7 @@ function drawLayer(layer: Layer, context: CanvasRenderingContext2D) {
 onMounted(async () => {
 	const response = await fetch(PsdFile)
 	const arrayBuffer = await response.arrayBuffer()
-	const psd = await readPsd(arrayBuffer)
+	const psd = await readPsd(arrayBuffer, { useImageData: true })
 	console.log('psd: ', psd)
 	// Try to find an existing canvas
 	let canvas = document.querySelector('canvas')
