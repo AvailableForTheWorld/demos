@@ -13,10 +13,17 @@ interface Event {
     ref_type: string
     ref: string
     commit_from: string
+    commit_title: string
   }
   author: {
     name: string
   }
+}
+
+interface ProjectInfo {
+  id: number
+  name: string
+  web_url: string
 }
 
 interface PaginationInfo {
@@ -78,6 +85,7 @@ const GitLabEventSearch: React.FC = () => {
   const [pageInput, setPageInput] = useState<string>('')
   const [eventDetails, setEventDetails] = useState<CommitDetails | null>(null)
   const [deletedItemInfo, setDeletedItemInfo] = useState<DeletedItemInfo | null>(null)
+  const [projectInfos, setProjectInfos] = useState<{ [key: number]: ProjectInfo }>({})
 
   const api = new Gitlab({
     host: 'https://git.xmov.ai',
@@ -113,6 +121,19 @@ const GitLabEventSearch: React.FC = () => {
 
       setEvents(data as Event[])
       setPaginationInfo(paginationInfo)
+      const uniqueProjectIds = [...new Set(data.map((event: Event) => event.project_id))]
+      const projectInfoPromises = uniqueProjectIds.map(async (projectId) => {
+        const projectInfo = await api.Projects.show(projectId)
+        return { id: projectId, name: projectInfo.name, web_url: projectInfo.web_url }
+      })
+
+      const projectInfos = await Promise.all(projectInfoPromises)
+      const projectInfoMap = projectInfos.reduce((acc, info) => {
+        acc[info.id] = info
+        return acc
+      }, {} as { [key: number]: ProjectInfo })
+
+      setProjectInfos(projectInfoMap)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -301,6 +322,20 @@ If this was unintended, please contact your project administrator immediately.
       key: 'id'
     },
     {
+      title: 'Project',
+      key: 'project',
+      render: (_: any, record: Event) => {
+        const projectInfo = projectInfos[record.project_id]
+        return projectInfo ? (
+          <a href={projectInfo.web_url} target="_blank" rel="noopener noreferrer">
+            {projectInfo.name}
+          </a>
+        ) : (
+          'Loading...'
+        )
+      }
+    },
+    {
       title: 'Action',
       dataIndex: 'action_name',
       key: 'action_name'
@@ -310,6 +345,13 @@ If this was unintended, please contact your project administrator immediately.
       dataIndex: 'created_at',
       key: 'created_at',
       render: (text: string) => new Date(text).toLocaleString()
+    },
+    {
+      title: 'Title',
+      key: 'title',
+      render(_: any, record: Event) {
+        return record.push_data ? `${record.push_data.commit_title}` : ''
+      }
     },
     {
       title: 'Details',
