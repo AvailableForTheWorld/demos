@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Gitlab } from '@gitbeaker/rest'
 import { Table, Button, Modal, Input, Pagination, Tabs } from 'antd'
-import { Editor } from '@monaco-editor/react'
+import { DiffEditor } from '@monaco-editor/react'
 
 interface Event {
   id: number
@@ -29,6 +29,10 @@ interface CommitFile {
   renamed_file: boolean
   deleted_file: boolean
   diff: string
+  parsedDiff?: {
+    original: string
+    modified: string
+  }
 }
 
 const { TabPane } = Tabs
@@ -89,17 +93,68 @@ const GitLabEventSearch: React.FC = () => {
     setCurrentPage(page)
   }
 
+  const parseDiff = (diffContent: string) => {
+    const lines = diffContent.split('\n')
+    let original = ''
+    let modified = ''
+
+    lines.forEach((line) => {
+      if (line.startsWith('---') || line.startsWith('+++')) {
+        // Skip diff header lines
+        return
+      }
+      if (line.startsWith('-')) {
+        original += line.substring(1) + '\n'
+      } else if (line.startsWith('+')) {
+        modified += line.substring(1) + '\n'
+      } else {
+        original += line.startsWith(' ') ? line.substring(1) : line
+        original += '\n'
+        modified += line.startsWith(' ') ? line.substring(1) : line
+        modified += '\n'
+      }
+    })
+
+    return { original, modified }
+  }
+
   const handleDetailsClick = async (event: Event) => {
-    console.log('event: ', event)
     if (event.action_name.includes('pushed') && event.push_data && event.push_data.commit_to) {
       try {
         const commit = await api.Commits.showDiff(event.project_id, event.push_data.commit_to)
-        console.log('commit: ', commit)
-        setCommitFiles(commit as CommitFile[])
+        const processedCommitFiles = commit.map((file: CommitFile) => ({
+          ...file,
+          parsedDiff: parseDiff(file.diff)
+        }))
+        setCommitFiles(processedCommitFiles)
         setModalVisible(true)
       } catch (err) {
         console.error('Failed to fetch commit details:', err)
       }
+    }
+  }
+
+  const getLanguageFromFilename = (filename: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase()
+    switch (extension) {
+      case 'js':
+      case 'jsx':
+      case 'ts':
+      case 'tsx':
+      case 'vue':
+        return 'javascript'
+      case 'py':
+        return 'python'
+      case 'java':
+        return 'java'
+      case 'html':
+        return 'html'
+      case 'css':
+        return 'css'
+      case 'json':
+        return 'json'
+      default:
+        return 'plaintext'
     }
   }
 
@@ -162,12 +217,27 @@ const GitLabEventSearch: React.FC = () => {
         open={modalVisible}
         onOk={() => setModalVisible(false)}
         onCancel={() => setModalVisible(false)}
-        width={800}
+        width={1000}
+        bodyStyle={{ maxHeight: '80vh', overflow: 'auto' }}
       >
         <Tabs>
           {commitFiles.map((file, index) => (
             <TabPane tab={file.new_path} key={index}>
-              <Editor height="400px" defaultLanguage="diff" value={file.diff} options={{ readOnly: true }} />
+              <DiffEditor
+                height="400px"
+                language={getLanguageFromFilename(file.new_path)}
+                original={file.parsedDiff?.original}
+                modified={file.parsedDiff?.modified}
+                options={{
+                  readOnly: true,
+                  renderSideBySide: true,
+                  ignoreTrimWhitespace: false,
+                  renderIndicators: true,
+                  originalEditable: false,
+                  diffCodeLens: true,
+                  scrollBeyondLastLine: false
+                }}
+              />
             </TabPane>
           ))}
         </Tabs>
