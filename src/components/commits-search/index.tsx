@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Gitlab } from '@gitbeaker/rest'
-import { Table, Button, Modal, Input, Pagination, Tabs } from 'antd'
+import { Table, Button, Modal, Input, Pagination, DatePicker, Tabs, Space } from 'antd'
 import { DiffEditor } from '@monaco-editor/react'
+import type { Dayjs } from 'dayjs'
+
+const { RangePicker } = DatePicker
 
 interface Event {
   id: number
@@ -73,6 +76,11 @@ interface DeletedItemInfo {
   project_url?: string
 }
 
+interface APIResponse<T> {
+  data: T[]
+  paginationInfo: PaginationInfo
+}
+
 const GitLabEventSearch: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -86,6 +94,7 @@ const GitLabEventSearch: React.FC = () => {
   const [eventDetails, setEventDetails] = useState<CommitDetails | null>(null)
   const [deletedItemInfo, setDeletedItemInfo] = useState<DeletedItemInfo | null>(null)
   const [projectInfos, setProjectInfos] = useState<{ [key: number]: ProjectInfo }>({})
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
 
   const api = new Gitlab({
     host: 'https://git.xmov.ai',
@@ -94,7 +103,7 @@ const GitLabEventSearch: React.FC = () => {
 
   useEffect(() => {
     fetchEvents()
-  }, [currentPage, perPage])
+  }, [currentPage, perPage, dateRange])
 
   const fetchEvents = async () => {
     setLoading(true)
@@ -111,13 +120,27 @@ const GitLabEventSearch: React.FC = () => {
 
       const userId = users[0].id
 
-      const { data, paginationInfo } = await api.Events.all({
+      const params: {
+        userId: number
+        showExpanded: boolean
+        maxPages: number
+        perPage: number
+        page: number
+        after?: string
+        before?: string
+      } = {
         userId: userId,
         showExpanded: true,
         maxPages: 1,
         perPage: perPage,
         page: currentPage
-      })
+      }
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        params.after = dateRange[0].toISOString()
+        params.before = dateRange[1].toISOString()
+      }
+
+      const { data, paginationInfo } = (await api.Events.all(params)) as APIResponse<Event>
 
       setEvents(data as Event[])
       setPaginationInfo(paginationInfo)
@@ -139,6 +162,11 @@ const GitLabEventSearch: React.FC = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
+    setDateRange(dates)
+    setCurrentPage(1) // Reset to first page when changing date range
   }
 
   const handlePageChange = (page: number) => {
@@ -363,6 +391,10 @@ If this was unintended, please contact your project administrator immediately.
   return (
     <div>
       <h2>Your GitLab Events</h2>
+      <Space style={{ marginBottom: 16 }}>
+        <RangePicker onChange={handleDateRangeChange} style={{ marginRight: 16 }} />
+        <Button onClick={fetchEvents}>Refresh</Button>
+      </Space>
       <Table dataSource={events} columns={columns} loading={loading} pagination={false} rowKey="id" />
       <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Pagination
