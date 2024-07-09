@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Gitlab } from '@gitbeaker/rest'
-import { Table, Button, Modal, Input, Pagination, DatePicker, Tabs, Space } from 'antd'
+import { Table, Button, Modal, Input, Pagination, DatePicker, Tabs, Space, message } from 'antd'
 import { DiffEditor } from '@monaco-editor/react'
 import type { Dayjs } from 'dayjs'
+import { useNavigate } from 'react-router-dom'
 
 const { RangePicker } = DatePicker
 
@@ -82,6 +83,7 @@ interface APIResponse<T> {
 }
 
 const GitLabEventSearch: React.FC = () => {
+  const navigate = useNavigate()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -96,22 +98,36 @@ const GitLabEventSearch: React.FC = () => {
   const [projectInfos, setProjectInfos] = useState<{ [key: number]: ProjectInfo }>({})
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
 
-  const api = new Gitlab({
-    host: 'https://git.xmov.ai',
-    token: import.meta.env.VITE_GITLAB_TOKEN
-  })
+  const [api, setApi] = useState<any | null>(null)
 
   useEffect(() => {
-    fetchEvents()
-  }, [currentPage, perPage, dateRange])
+    const token = localStorage.getItem('gitlabToken')
+    if (token) {
+      const newApi = new Gitlab({
+        host: 'https://git.xmov.ai',
+        token: token
+      })
+      setApi(newApi)
+    } else {
+      navigate('/login')
+    }
+  }, [navigate])
+
+  useEffect(() => {
+    if (api) {
+      fetchEvents()
+    }
+  }, [api, currentPage, perPage, dateRange])
 
   const fetchEvents = async () => {
+    if (!api) return
     setLoading(true)
     setError(null)
 
     try {
+      const username = localStorage.getItem('gitlabUsername')
       const users = await api.Users.all({
-        username: import.meta.env.VITE_GITLAB_AUTHOR
+        username: username || ''
       })
 
       if (users.length === 0) {
@@ -197,28 +213,6 @@ const GitLabEventSearch: React.FC = () => {
 
     return { original, modified }
   }
-  const formatDeletedItemInfo = (info: DeletedItemInfo) => {
-    const lastCommitInfo = info.last_commit_details
-      ? `
-## Last Commit Before Deletion
-- **Short ID:** ${info.last_commit_details.short_id}
-- **Title:** ${info.last_commit_details.title}
-- **Author:** ${info.last_commit_details.author_name}
-- **Date:** ${new Date(info.last_commit_details.authored_date).toLocaleString()}`
-      : ''
-
-    return `# Deleted Item Information
-
-## Details
-- **Type:** ${info.ref_type}
-- **Name:** ${info.ref}
-- **Action:** ${info.action}
-${lastCommitInfo}
-
-This ${info.ref_type} has been permanently deleted from the repository.
-If this was unintended, please contact your project administrator immediately.
-`
-  }
 
   const handleDetailsClick = async (event: Event) => {
     setLoading(true)
@@ -228,11 +222,6 @@ If this was unintended, please contact your project administrator immediately.
     setDeletedItemInfo(null)
 
     try {
-      const api = new Gitlab({
-        host: 'https://git.xmov.ai',
-        token: import.meta.env.VITE_GITLAB_TOKEN
-      })
-
       const project = await api.Projects.show(event.project_id)
       const projectUrl = project.web_url
 
@@ -391,7 +380,18 @@ If this was unintended, please contact your project administrator immediately.
 
   return (
     <div>
-      <h2>Your GitLab Events</h2>
+      <section style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
+        <h2>GitLab History</h2>
+        <Button
+          onClick={() => {
+            localStorage.removeItem('gitlabToken')
+            localStorage.removeItem('gitlabUsername')
+            window.location.href = '/login'
+          }}
+        >
+          Logout
+        </Button>
+      </section>
       <Space style={{ marginBottom: 16 }}>
         <RangePicker onChange={handleDateRangeChange} style={{ marginRight: 16 }} />
         <Button onClick={fetchEvents}>Refresh</Button>
