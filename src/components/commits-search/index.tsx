@@ -372,6 +372,7 @@ If this was unintended, please contact your project administrator immediately.
       title: 'Created At',
       dataIndex: 'created_at',
       key: 'created_at',
+      sorter: (a: Event, b: Event) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
       render: (text: string) => new Date(text).toLocaleString()
     },
     {
