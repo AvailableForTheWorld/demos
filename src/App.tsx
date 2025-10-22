@@ -1,8 +1,8 @@
-import { ParentComp4 } from './02.hooks-master'
+import { CustomIntervalComp } from './03.closure-trap'
 function App() {
   return (
     <div className="App">
-      <ParentComp4 />
+      <CustomIntervalComp />
     </div>
   )
 }
