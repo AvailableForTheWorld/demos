@@ -1,8 +1,8 @@
-import { CustomIntervalComp } from './03.closure-trap'
+import { Fff } from './04.typescript'
 function App() {
   return (
     <div className="App">
-      <CustomIntervalComp />
+      <Fff />
     </div>
   )
 }

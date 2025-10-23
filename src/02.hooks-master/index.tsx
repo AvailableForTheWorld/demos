@@ -205,7 +205,7 @@ export const ParentComp4 = () => {
     console.log('this is callback')
   }
 
-  const memoCount = useMemo(() => count, [])
+  const memoCount = useMemo(() => count, [count])
 
   const storedCallback = useCallback(callback, [])
   useEffect(() => {
