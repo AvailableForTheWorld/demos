@@ -1,8 +1,9 @@
-import { Fff } from './04.typescript'
+import { BaseControlledComp1 } from './05.uncontrolled'
+
 function App() {
   return (
     <div className="App">
-      <Fff />
+      <BaseControlledComp1 />
     </div>
   )
 }

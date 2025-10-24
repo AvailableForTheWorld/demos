@@ -78,7 +78,7 @@ const useInterval = (fn: Function, delay: number) => {
     ref.current = fn
   })
 
-  const cleanRef = useRef<Function>(() => {})
+  const cleanRef = useRef<Function>(() => void 0)
 
   const clean = useCallback(() => {
     cleanRef.current?.()
