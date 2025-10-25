@@ -1,9 +1,17 @@
-import { BaseControlledComp1 } from './05.uncontrolled'
+import { useState } from 'react'
+import { CalendarNew } from './05.uncontrolled'
 
 function App() {
+  const [value, setValue] = useState(new Date())
+  console.log('app rendering')
   return (
     <div className="App">
-      <BaseControlledComp1 />
+      <CalendarNew
+        defaultValue={new Date()}
+        onChange={(date) => {
+          // setValue(date)
+        }}
+      />
     </div>
   )
 }
