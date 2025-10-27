@@ -1,17 +1,12 @@
 import { useState } from 'react'
-import { CalendarNew } from './05.uncontrolled'
+import { MiniCalendarWrapper } from './07.mini-calendar'
 
 function App() {
   const [value, setValue] = useState(new Date())
   console.log('app rendering')
   return (
     <div className="App">
-      <CalendarNew
-        defaultValue={new Date()}
-        onChange={(date) => {
-          // setValue(date)
-        }}
-      />
+      <MiniCalendarWrapper />
     </div>
   )
 }
