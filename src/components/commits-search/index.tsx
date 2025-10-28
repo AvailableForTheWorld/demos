@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Gitlab } from '@gitbeaker/rest'
-import { Table, Button, Modal, Input, Pagination, DatePicker, Tabs, Space, message } from 'antd'
+import { Table, Button, Modal, Input, Pagination, DatePicker, Tabs, Space, message, Select } from 'antd'
 import { DiffEditor } from '@monaco-editor/react'
 import type { Dayjs } from 'dayjs'
 import { useNavigate } from 'react-router-dom'
@@ -97,6 +97,7 @@ const GitLabEventSearch: React.FC = () => {
   const [deletedItemInfo, setDeletedItemInfo] = useState<DeletedItemInfo | null>(null)
   const [projectInfos, setProjectInfos] = useState<{ [key: number]: ProjectInfo }>({})
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
 
   const [api, setApi] = useState<any | null>(null)
 
@@ -117,7 +118,7 @@ const GitLabEventSearch: React.FC = () => {
     if (api) {
       fetchEvents()
     }
-  }, [api, currentPage, perPage, dateRange])
+  }, [api, currentPage, perPage, dateRange, sortOrder])
 
   const fetchEvents = async () => {
     if (!api) return
@@ -144,12 +145,14 @@ const GitLabEventSearch: React.FC = () => {
         page: number
         after?: string
         before?: string
+        sort?: 'asc' | 'desc'
       } = {
         userId: userId,
         showExpanded: true,
         maxPages: 1,
         perPage: perPage,
-        page: currentPage
+        page: currentPage,
+        sort: sortOrder
       }
       if (dateRange && dateRange[0] && dateRange[1]) {
         params.after = dateRange[0].toISOString()
@@ -394,6 +397,18 @@ const GitLabEventSearch: React.FC = () => {
       </section>
       <Space style={{ marginBottom: 16 }}>
         <RangePicker onChange={handleDateRangeChange} style={{ marginRight: 16 }} />
+        <Select
+          value={sortOrder}
+          onChange={(value) => {
+            setSortOrder(value)
+            setCurrentPage(1) // Reset to first page when changing sort
+          }}
+          style={{ width: 150 }}
+          options={[
+            { value: 'asc', label: 'Time: Ascending' },
+            { value: 'desc', label: 'Time: Descending' }
+          ]}
+        />
         <Button onClick={fetchEvents}>Refresh</Button>
       </Space>
       <Table dataSource={events} columns={columns} loading={loading} pagination={false} rowKey="id" />
