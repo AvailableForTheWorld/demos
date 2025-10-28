@@ -98,6 +98,7 @@ const GitLabEventSearch: React.FC = () => {
   const [projectInfos, setProjectInfos] = useState<{ [key: number]: ProjectInfo }>({})
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null)
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [eventFilter, setEventFilter] = useState<'all' | 'commits' | 'pushed' | 'merged' | 'created' | 'deleted' | 'commented'>('commits')
 
   const [api, setApi] = useState<any | null>(null)
 
@@ -118,7 +119,7 @@ const GitLabEventSearch: React.FC = () => {
     if (api) {
       fetchEvents()
     }
-  }, [api, currentPage, perPage, dateRange, sortOrder])
+  }, [api, currentPage, perPage, dateRange, sortOrder, eventFilter])
 
   const fetchEvents = async () => {
     if (!api) return
@@ -161,7 +162,33 @@ const GitLabEventSearch: React.FC = () => {
 
       const { data, paginationInfo } = (await api.Events.all(params)) as APIResponse<Event>
 
-      setEvents(data as Event[])
+      // Filter events based on selected filter
+      let filteredEvents = data as Event[]
+      
+      if (eventFilter === 'commits' || eventFilter === 'pushed') {
+        filteredEvents = filteredEvents.filter(
+          (event) => event.action_name === 'pushed to' || event.action_name === 'pushed new'
+        )
+      } else if (eventFilter === 'merged') {
+        filteredEvents = filteredEvents.filter(
+          (event) => event.action_name === 'accepted' || event.action_name === 'merged'
+        )
+      } else if (eventFilter === 'created') {
+        filteredEvents = filteredEvents.filter(
+          (event) => event.action_name === 'created'
+        )
+      } else if (eventFilter === 'deleted') {
+        filteredEvents = filteredEvents.filter(
+          (event) => event.action_name === 'deleted'
+        )
+      } else if (eventFilter === 'commented') {
+        filteredEvents = filteredEvents.filter(
+          (event) => event.action_name === 'commented on'
+        )
+      }
+      // 'all' shows everything without filtering
+
+      setEvents(filteredEvents)
       setPaginationInfo(paginationInfo)
       const uniqueProjectIds = [...new Set(data.map((event: Event) => event.project_id))]
       const projectInfoPromises = uniqueProjectIds.map(async (projectId) => {
@@ -395,8 +422,25 @@ const GitLabEventSearch: React.FC = () => {
           Logout
         </Button>
       </section>
-      <Space style={{ marginBottom: 16 }}>
-        <RangePicker onChange={handleDateRangeChange} style={{ marginRight: 16 }} />
+      <Space style={{ marginBottom: 16 }} wrap>
+        <Select
+          value={eventFilter}
+          onChange={(value) => {
+            setEventFilter(value)
+            setCurrentPage(1)
+          }}
+          style={{ width: 180 }}
+          options={[
+            { value: 'commits', label: 'Commits Only' },
+            { value: 'all', label: 'All Events' },
+            { value: 'pushed', label: 'Push Events' },
+            { value: 'merged', label: 'Merge Events' },
+            { value: 'created', label: 'Created Events' },
+            { value: 'deleted', label: 'Deleted Events' },
+            { value: 'commented', label: 'Comment Events' }
+          ]}
+        />
+        <RangePicker onChange={handleDateRangeChange} />
         <Select
           value={sortOrder}
           onChange={(value) => {
