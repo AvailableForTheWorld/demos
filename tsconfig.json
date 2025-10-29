@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "useDefineForClassFields": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ds-algo-learning/shared": ["./packages/shared/src/index.ts"]
+    }
+  }
+}
