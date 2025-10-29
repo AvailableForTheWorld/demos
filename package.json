@@ -1,0 +1,22 @@
+{
+  "name": "demos-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A monorepo containing various demo projects",
+  "scripts": {
+    "dev": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" dev",
+    "build": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" build",
+    "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
+    "lint": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" lint",
+    "clean": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml,yaml}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
