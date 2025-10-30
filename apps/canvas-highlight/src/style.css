@@ -11,6 +11,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --sentence-highlight-bg: #ded9ff;
+  --sentence-highlight-color: black;
+}
+
+.sentence-highlight {
+  background-color: var(--sentence-highlight-bg);
+  color: var(--sentence-highlight-color);
 }
 
 a {
