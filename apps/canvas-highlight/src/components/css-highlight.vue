@@ -1,17 +1,33 @@
 <template>
   <div class="highlight-wrapper">
     <canvas ref="canvasRef" class="highlight-canvas"></canvas>
-    <div ref="textContainer" class="text-container" v-html="domString"></div>
+    <div
+      ref="textContainer"
+      class="text-container"
+      v-html="content?.domString"
+    ></div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 
-const props = defineProps<{
+export interface TextContent {
   domString: string
+  highlighted: boolean
   startIndex: number
   endIndex: number
-}>()
+}
+
+interface Props {
+  id?: string
+  content: TextContent | null
+  layout?: 'mobile' | 'pc'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  content: null,
+  layout: 'mobile',
+})
 
 function getNodeAndOffset(wrap_dom, start = 0, end = 0) {
   const txtList = []
@@ -51,11 +67,6 @@ const getHighlightColor = () => {
 
   const computedStyle = window.getComputedStyle(tempEl)
   const bgColor = computedStyle.backgroundColor
-  console.log(
-    '%c [ bgColor ]-56',
-    'font-size:13px; background:pink; color:#bf2c9f;',
-    bgColor
-  )
 
   document.body.removeChild(tempEl)
 
@@ -65,8 +76,8 @@ const getHighlightColor = () => {
 const getRange = () => {
   const [startNode, startOffset, endNode, endOffset] = getNodeAndOffset(
     textContainer.value,
-    props.startIndex,
-    props.endIndex
+    props.content?.startIndex,
+    props.content?.endIndex
   )
 
   const range = new Range()
@@ -138,9 +149,14 @@ onMounted(() => {
 })
 
 watch(
-  () => [props.text, props.startIndex, props.endIndex],
-  () => {
-    applyHighlight()
+  () => props.content,
+  (val) => {
+    if (val?.highlighted) {
+      applyHighlight()
+    }
+  },
+  {
+    deep: true,
   }
 )
 </script>

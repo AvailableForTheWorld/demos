@@ -25,9 +25,12 @@ const endIndex = ref(30)
 
 <template>
   <CSSHighlight
-    :dom-string="domString"
-    :start-index="startIndex"
-    :end-index="endIndex"
+    :content="{
+      domString,
+      startIndex,
+      endIndex,
+      highlighted: true,
+    }"
   />
 </template>
 
