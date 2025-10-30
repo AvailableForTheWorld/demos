@@ -1,0 +1,46 @@
+.wholeInterFace{
+    position: relative;
+    width: 300px;
+    height: 200px;
+    border-radius: 10px;
+    background-color: #bbb;
+
+}
+
+.btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border:0;
+    margin: 10px 5px 10px;
+}
+.wholeInterFace .red {
+    
+    background-color: #ed6a5e;
+    margin-left: 10px;
+}
+.green{
+    background-color: #61c454;
+}
+.yellow{
+    background-color: #f5bd4f;
+}
+
+.container{
+    
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.number-span{
+    display:inline-block;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    background-color: rgb(127, 151, 156);
+}
